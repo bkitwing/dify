@@ -1,0 +1,22 @@
+upstream meilisearch_backend {
+    server meilisearch:7700;
+}
+
+server {
+    listen 7700 ssl;
+    server_name mc.brahmakumaris.com;
+
+    ssl_certificate     /etc/ssl/mc.brahmakumaris.com.crt;
+    ssl_certificate_key /etc/ssl/mc.brahmakumaris.com.key;
+
+    # Add the resolver for Docker DNS
+    resolver 127.0.0.11 valid=30s;
+    
+    location / {
+        proxy_pass http://meilisearch_backend;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+
